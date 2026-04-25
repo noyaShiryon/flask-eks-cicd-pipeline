@@ -47,9 +47,9 @@ module "eks" {
   # Define managed node groups for worker instances
   eks_managed_node_groups = {
     group_1 = {
-      min_size     = 1
-      max_size     = 2
-      desired_size = 1
+      min_size       = 1
+      max_size       = 2
+      desired_size   = 1
       instance_types = ["t3.medium"] # Balanced performance and cost
     }
   }
