@@ -14,7 +14,7 @@ provider "aws" {
   default_tags {
     tags = {
       Project    = "eks-devops-assigment"
-      Enviroment = var.enviroment
+      Enviroment = var.environment
       ManageBy   = "terrafrom"
     }
   }
