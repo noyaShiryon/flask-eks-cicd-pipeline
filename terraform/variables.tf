@@ -8,11 +8,6 @@ variable "environment" {
     description = "Enviroment name"
     type = string
     default = "dev"
-    
-    validation {
-      condition = contains(["dev","staging","prod"], environment)
-        error_message = "enviroment must be dev. staging, or prod"
-    }
 }
 
 variable "cluster_name" {
