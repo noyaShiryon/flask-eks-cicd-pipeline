@@ -4,13 +4,13 @@ variable "aws_region" {
     default = "us-east-1"
 }
 
-variable "enviroment" {
+variable "environment" {
     description = "Enviroment name"
     type = string
     default = "dev"
     
     validation {
-      condition = contains(["dev","staging","prod"], var.enviroment)
+      condition = contains(["dev","staging","prod"], var.environment)
         error_message = "enviroment must be dev. staging, or prod"
     }
 }
