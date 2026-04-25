@@ -1,0 +1,20 @@
+# Default values for flask-app.
+replicaCount: 2 
+
+image:
+  repository: "" 
+  pullPolicy: always
+  tag: "latest"
+
+service:
+  type: LoadBalancer 
+  port: 80
+  targetPort: 5000 
+
+resources: # Performance and Cost awareness
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
