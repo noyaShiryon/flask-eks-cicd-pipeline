@@ -13,5 +13,5 @@ variable "environment" {
 variable "cluster_name" {
   description = "Name of the EKS cluste"
   type        = string
-  default     = "flask-production-cluster"
+  default     = "flask-cluster-v2"
 }
