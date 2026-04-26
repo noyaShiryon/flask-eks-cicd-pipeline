@@ -39,7 +39,7 @@ jobs:
 
       - name: Update Kubeconfig
         run: |
-          aws eks update-kubeconfig --name flask-production-cluster-v2 --region us-east-1
+          aws eks update-kubeconfig --name flask-cluster-v2 --region us-east-1
 
       - name: Deploy with Helm
         run: |
