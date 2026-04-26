@@ -24,7 +24,7 @@ module "vpc" {
 
 # Create ECR repository for our application images
 resource "aws_ecr_repository" "app" {
-  name                 = "flask-app-repo"
+  name                 = "flask-app-repo-v2"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
