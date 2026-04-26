@@ -28,10 +28,12 @@ This repository implements a complete lifecycle of a web application, from Infra
 cd terraform
 terraform init
 terraform apply -auto-approve
+```bash
 
 ### 2. Connect to Cluster
 ```bash
 aws eks update-kubeconfig --name flask-cluster-v2 --region us-east-1
+```bash
 
 ### 3. CI/CD Flow
 Every push to main triggers:
@@ -50,5 +52,6 @@ To avoid unnecessary AWS costs, the infrastructure can be fully decommissioned u
 1. **Uninstall Helm Release:** Removes the Load Balancer and application resources.
    ```bash
    helm uninstall flask-app
+   ```bash
 
 2. **Terraform Destroy:** Run the Terraform Destroy workflow via GitHub Actions (manual trigger) to tear down the EKS cluster, VPC, and ECR repository.
