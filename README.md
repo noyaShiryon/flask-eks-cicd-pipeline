@@ -1,56 +1,56 @@
+# AWS EKS Cloud Architecture & CI/CD Pipeline (v2.0)
 
-# AWS EKS Cloud Architecture & CI/CD Pipeline
+![Application Screenshot](docs/app-screenshot.png)
 
-A comprehensive DevOps project demonstrating a containerized Flask application deployed on a production-ready AWS EKS cluster. The project features Infrastructure as Code (IaC), automated CI/CD workflows, and Kubernetes orchestration.
+![Application UI](docs/app-screenshot.png)
 
 ## Project Overview
-This repository implements a complete lifecycle of a web application:
-- **Infrastructure:** Provisioned with **Terraform** (VPC, Subnets, EKS, ECR).
-- **App:** Python **Flask** application with a Dockerized environment.
-- **Orchestration:** **Kubernetes (EKS)** managed via **Helm Charts**.
-- **Automation:** **GitHub Actions** for CI/CD (Infrastructure & Application).
+This repository implements a complete lifecycle of a web application, from Infrastructure as Code to a fully automated CI/CD pipeline deploying to a production-ready AWS EKS cluster.
 
-## Architecture Components
-- **Network:** Custom VPC with Public/Private subnets, NAT Gateway for secure egress.
-- **Security:** IAM Roles for Service Accounts (IRSA), Security Groups for Node-to-Cluster communication.
-- **State Management:** Terraform remote state stored in **S3** with **DynamoDB** state locking.
+## Architecture & Workflow
+![Cloud Architecture Diagram](docs/architecture-diagram.png)
+- **Infrastructure:** Provisioned via **Terraform** (VPC, Subnets, EKS, ECR).
+- **CI/CD:** Automated via **GitHub Actions** for both Infrastructure and Application.
+- **Orchestration:** **Kubernetes (EKS)** managed by **Helm**.
 
 ## Tech Stack
-- **Cloud:** AWS (EKS, ECR, VPC, S3, DynamoDB)
-- **IaC:** Terraform (HCL)
-- **Containers:** Docker
-- **Package Manager:** Helm 3
-- **CI/CD:** GitHub Actions
+| Category | Tools |
+| :--- | :--- |
+| **Cloud** | AWS (EKS, ECR, VPC, S3, DynamoDB) |
+| **IaC** | Terraform |
+| **Containers** | Docker, Helm 3 |
+| **CI/CD** | GitHub Actions |
 
-## How to Deploy
+---
+
+## How to Run
 
 ### 1. Infrastructure Setup
-Navigate to the terraform directory and initialize the backend:
 ```bash
 cd terraform
 terraform init
 terraform apply -auto-approve
 
-
-### 2. Configure Access
-Update your local kubeconfig to interact with the new cluster:
+### 2. Connect to Cluster
 ```bash
-aws eks update-kubeconfig --name flask-production-cluster --region us-east-1
+aws eks update-kubeconfig --name flask-cluster-v2 --region us-east-1
 
-### 3. CI/CD Pipeline
-The pipeline is triggered automatically on every push to the main branch:
-Build: Dockerizes the Flask app using a slim Python image.
-Push: Tags and pushes the image to Amazon ECR with a unique Git SHA.
-Deploy: Uses Helm to upgrade the application on the EKS cluster with zero downtime.
+### 3. CI/CD Flow
+Every push to main triggers:
+Docker Build: Creates a secure, non-root image.
+ECR Push: Stores the image in Amazon ECR.
+Helm Deploy: Deploys to EKS with rolling updates.
 
-### Features & Best Practices
-State Management: Terraform state is stored securely in an S3 bucket with DynamoDB locking.
-Security: Implemented Least Privilege principle for IAM roles.
-Scalability: EKS managed node groups for automated scaling.
-Clean Code: Use of .gitignore to prevent sensitive data or heavy binaries from entering Git.
+### Best Practices Implemented
+- **Security:** Images run as non-root users for runtime security.
+- **State Management & Locking:** The project uses **S3 with DynamoDB locking** for Terraform state, ensuring that even during a `destroy` operation, the state remains consistent and protected.
+- **Scalability:** Managed Node Groups for high availability.
+- **Resource Management:** Kubernetes CPU/Memory limits to prevent OOM.
 
-### Monitoring the Deployment
-To check the status of your pods and get the LoadBalancer URL:
-```bash
-kubectl get pods
-kubectl get svc flask-app
+## Cleanup
+To avoid unnecessary AWS costs, the infrastructure can be fully decommissioned using the automated destroy workflow:
+1. **Uninstall Helm Release:** Removes the Load Balancer and application resources.
+   ```bash
+   helm uninstall flask-app
+
+2. **Terraform Destroy:** Run the Terraform Destroy workflow via GitHub Actions (manual trigger) to tear down the EKS cluster, VPC, and ECR repository.
