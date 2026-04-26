@@ -1,0 +1,49 @@
+name: Build and Deploy to EKS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+      - 'helm/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and Push Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: flask-app-repo
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Update Kubeconfig
+        run: |
+          aws eks update-kubeconfig --name flask-production-cluster-v2 --region us-east-1
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install flask-app ./helm/flask-app \
+            --set image.repository=${{ steps.login-ecr.outputs.registry }}/flask-app-repo-v2 \
+            --set image.tag=${{ github.sha }} \
+            --wait --timeout 5m

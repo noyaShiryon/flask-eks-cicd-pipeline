@@ -29,23 +29,21 @@ jobs:
       - name: Build and Push Image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: flask-app-repo
+          ECR_REPOSITORY: flask-app-repo-v2
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          # בנייה עם הקונטקסט של תיקיית app
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          # תיוג נוסף כ-latest לצורך עקביות
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
       - name: Update Kubeconfig
         run: |
-          aws eks update-kubeconfig --name flask-production-cluster --region us-east-1
+          aws eks update-kubeconfig --name flask-production-cluster-v2 --region us-east-1
 
       - name: Deploy with Helm
         run: |
           helm upgrade --install flask-app ./helm/flask-app \
-            --set image.repository=${{ steps.login-ecr.outputs.registry }}/flask-app-repo \
+            --set image.repository=${{ steps.login-ecr.outputs.registry }}/flask-app-repo-v2 \
             --set image.tag=${{ github.sha }} \
             --wait --timeout 5m
