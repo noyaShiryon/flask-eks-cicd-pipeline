@@ -6,7 +6,7 @@ app = Flask(__name__)
 def home():
     return jsonify({
         "status": "success",
-        "message": "Hello from EKS! Your Flask app is running smoothly v2",
+        "message": "Hello from EKS! Your Flask app is running smoothly v2.2",
         "version": "2.0"
     })
 
