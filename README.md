@@ -1,7 +1,5 @@
 # AWS EKS Cloud Architecture & CI/CD Pipeline (v2.0)
 
-![Application Screenshot](docs/app-screenshot.png)
-
 ![Application UI](docs/app-screenshot.png)
 
 ## Project Overview
